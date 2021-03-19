@@ -22,39 +22,18 @@ driver = webdriver.Chrome(ChromeDriverManager().install() ,options=opts)
 class FindCounter(Resource):
     def get(self, champion):
         url = "https://www.op.gg/champion/{}/statistics/".format(champion.lower())
-        r = requests.get(url)
+        driver.get(url)
         data = {}
 
-        if(r.status_code == 200):
-            # set up soup for webscraping
-            websiteSoup = bs4.BeautifulSoup(r.text, features="html.parser")
+        if(driver.page_source != None):
+            counters = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__champion"]')
+            winrates = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__winrate"]')
 
-            # return
-            counters = websiteSoup.find(
-                'table', class_='champion-stats-header-matchup__table champion-stats-header-matchup__table--strong tabItem')
-
-            # this usually happens when the champion name is typed incorrectly
-            # or the champion doesn't have enough data (that's why it doesn't return 404)
-            if(counters == None):
-                return json.dumps(data), 200
-
-            counters = counters.tbody.find_all("tr")
-
-            if(counters == []):
-                return json.dumps(data), 200
-
-            for counter in counters:
-                champ_name = "".join([elem for elem in counter.find_all(
-                    "td")[0].contents if type(elem) == bs4.element.NavigableString]
-                )
-
-                # champion name appears with a lot of escape characters
-                champ_name = "".join(
-                    [val for val in champ_name if val.isalpha()]
-                )
-                win_rate = counter.find_all("td")[1].b.string
-
-                data[champ_name] = {"winRate": win_rate}
+            for counter, wr in zip(counters, winrates):
+                champ_name = counter.text
+                win_rate = wr.text
+                if(champ_name != ""):
+                    data[champ_name] = {"winRate": win_rate}
 
             return data, 200
 
