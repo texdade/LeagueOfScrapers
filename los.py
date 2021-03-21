@@ -1,11 +1,10 @@
 import os
-import requests
-import bs4
 import json
 import selenium
 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import NoSuchElementException
 from flask import Flask, request
 from flask_restful import Resource, Api
 
@@ -26,8 +25,11 @@ class FindCounter(Resource):
         data = {}
 
         if(driver.page_source != None):
-            counters = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__champion"]')
-            winrates = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__winrate"]')
+            try:
+                counters = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__champion"]')
+                winrates = driver.find_elements_by_xpath('//td[@class="champion-stats-header-matchup__table__winrate"]')
+            except NoSuchElementException:
+                return data, 404
 
             for counter, wr in zip(counters, winrates):
                 champ_name = counter.text
@@ -36,6 +38,7 @@ class FindCounter(Resource):
                     data[champ_name] = {"winRate": win_rate}
 
             return data, 200
+        return data, 404
 
 
 class WinRates(Resource):
@@ -45,8 +48,14 @@ class WinRates(Resource):
         data = {}
 
         if(driver.page_source != None):
-            elem = driver.find_element_by_xpath('//li[@data-tab-show-class="championLayout-matchup"]')
-            driver.execute_script("arguments[0].click();", elem)
+            #in order to get the data, get to the "counters" page by clicking the right "button"
+            try:
+                elem = driver.find_element_by_xpath('//li[@data-tab-show-class="championLayout-matchup"]')
+                driver.execute_script("arguments[0].click();", elem)
+            except NoSuchElementException:
+                return data, 404
+
+            #wait to the page to load after click
             driver.implicitly_wait(1)
             divs = driver.find_elements_by_xpath('//div[@class="champion-matchup-champion-list"]/div')
             
@@ -60,6 +69,7 @@ class WinRates(Resource):
                 }
                 
             return data, 200
+        return data, 404
 
 class Alive(Resource):
     def get(self):
