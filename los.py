@@ -13,9 +13,11 @@ api = Api(app)
 
 #Install driver
 opts=webdriver.ChromeOptions()
+opts.add_argument('--no-sandbox')
+opts.add_argument('--disable-dev-shm-usage')
 opts.headless=True
 
-driver = webdriver.Chrome(ChromeDriverManager().install() ,options=opts)
+driver = webdriver.Chrome(options=opts)
 
 # GET - returns the best three counters with win rate, empty if no stats are available
 class FindCounter(Resource):
@@ -40,7 +42,7 @@ class FindCounter(Resource):
             return data, 200
         return data, 404
 
-
+# GET - returns all the winrates for the selected champion, empty if no stats are available
 class WinRates(Resource):
     def get(self, champion):
         url = "https://www.op.gg/champion/{}/statistics/".format(champion.lower())
