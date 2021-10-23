@@ -11,13 +11,12 @@ from flask_restful import Resource, Api
 
 app = Flask(__name__)
 api = Api(app)
-'''
+
 #Install driver
 opts=webdriver.ChromeOptions()
 opts.add_argument('--no-sandbox')
 opts.add_argument('--disable-dev-shm-usage')
 opts.headless=True
-
 driver = webdriver.Chrome(options=opts)
 '''
 #Install driver
@@ -25,7 +24,7 @@ opts=webdriver.ChromeOptions()
 opts.headless=True
 
 driver = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install() , options=opts)
-
+'''
 # GET - returns the best three counters with win rate, empty if no stats are available
 class FindCounter(Resource):
     def get(self, champion):
@@ -212,4 +211,5 @@ api.add_resource(Build, '/build/<string:champion>')
 api.add_resource(Alive, '/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)

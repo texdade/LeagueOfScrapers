@@ -22,11 +22,13 @@ RUN CHROME_SETUP=google-chrome.deb && \
 RUN pip3 install selenium
 RUN pip3 install flask
 RUN pip3 install flask_restful
+RUN pip3 install gunicorn
 RUN pip3 install webdriver-manager
 
 ENV APP_HOME /usr/src/app
 WORKDIR /$APP_HOME
 
 COPY ./los.py $APP_HOME/
+COPY ./wsgi.py $APP_HOME/
 
-CMD python3 los.py
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi:app
