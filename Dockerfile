@@ -31,4 +31,6 @@ WORKDIR /$APP_HOME
 COPY ./los.py $APP_HOME/
 COPY ./wsgi.py $APP_HOME/
 
+EXPOSE 5000
+
 CMD gunicorn --bind 0.0.0.0:$PORT wsgi:app
