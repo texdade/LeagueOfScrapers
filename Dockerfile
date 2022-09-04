@@ -23,7 +23,7 @@ RUN pip3 install selenium
 RUN pip3 install flask
 RUN pip3 install flask_restful
 RUN pip3 install gunicorn
-RUN pip3 install webdriver-manager
+RUN pip3 install webdriver_manager
 
 ENV APP_HOME /usr/src/app
 WORKDIR /$APP_HOME

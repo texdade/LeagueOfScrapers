@@ -4,7 +4,7 @@ import selenium
 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.utils import ChromeType
 from selenium.common.exceptions import NoSuchElementException
 from flask import Flask, request
 from flask_restful import Resource, Api
